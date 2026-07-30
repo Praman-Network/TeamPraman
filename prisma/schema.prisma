@@ -102,6 +102,7 @@ model MeetingMember {
   attended  Boolean  @default(false)
   meeting   Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pointHistory PointHistory[]
 
   @@unique([meetingId, userId])
 }
@@ -123,6 +124,7 @@ model Idea {
   votes       IdeaVote[]
   comments    Comment[]
   attachments Attachment[]
+  pointHistory PointHistory[]
 }
 
 model IdeaVote {
@@ -165,6 +167,7 @@ model Task {
   assignee     User?     @relation(fields: [assigneeId], references: [id])
   project      Project?  @relation(fields: [projectId], references: [id])
   comments     Comment[]
+  pointHistory PointHistory[]
 }
 
 model Issue {
@@ -210,6 +213,16 @@ model PointHistory {
   reason      String
   sourceType  String?
   sourceId    String?
+  
+  taskId      String?
+  task        Task?          @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  
+  ideaId      String?
+  idea        Idea?          @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  
+  meetingMemberId String?
+  meetingMember   MeetingMember? @relation(fields: [meetingMemberId], references: [id], onDelete: Cascade)
+
   createdAt   DateTime @default(now())
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

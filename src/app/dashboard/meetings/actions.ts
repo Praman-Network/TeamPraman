@@ -43,7 +43,7 @@ export async function markAttendance(meetingId: string, attendeeIds: string[]) {
     })
 
     if (!existing) {
-      await db.meetingMember.create({
+      const member = await db.meetingMember.create({
         data: {
           meetingId,
           userId: user.id,
@@ -59,6 +59,7 @@ export async function markAttendance(meetingId: string, attendeeIds: string[]) {
           reason: 'Attended Team Meeting',
           sourceType: 'MEETING',
           sourceId: meetingId,
+          meetingMemberId: member.id,
         }
       })
     }

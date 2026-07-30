@@ -61,6 +61,7 @@ export async function logContribution(formData: FormData) {
         reason: `${title}: ${description}`,
         sourceType: 'TASK',
         sourceId: task.id,
+        taskId: task.id,
       }
     })
   }

@@ -30,6 +30,7 @@ export async function submitIdea(formData: FormData) {
       reason: `Submitted Idea: ${title}`,
       sourceType: 'IDEA',
       sourceId: idea.id,
+      ideaId: idea.id,
     }
   })
 
