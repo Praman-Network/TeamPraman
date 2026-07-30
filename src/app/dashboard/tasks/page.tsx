@@ -6,7 +6,8 @@ export default async function TasksPage() {
   const tasks = await db.task.findMany({
     where: { status: 'DONE' },
     include: {
-      assignee: true
+      assignee: true,
+      pointHistory: true
     },
     orderBy: { createdAt: 'desc' }
   })
@@ -16,15 +17,7 @@ export default async function TasksPage() {
     orderBy: { name: 'asc' }
   })
 
-  // Map to find the points based on title
-  const getPoints = (title: string) => {
-    if (title === 'Complete UI/UX Built') return '+5.0 pts';
-    if (title === 'PR Merged Successfully') return '+3.0 pts';
-    if (title === 'Implementation Plan Created') return '+3.0 pts';
-    if (title === 'Issue Raised') return '+2.0 pts';
-    if (title === 'Part / Component Built') return '+1.5 pts';
-    return '+0.0 pts';
-  }
+  // Removed hardcoded getPoints function since we now fetch actual points
 
   return (
     <div className="space-y-6">
@@ -149,7 +142,7 @@ export default async function TasksPage() {
                 </td>
                 <td className="p-4 text-right">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
-                    {getPoints(task.title)}
+                    +{task.pointHistory?.[0]?.points?.toFixed(1) || '0.0'} pts
                   </span>
                 </td>
               </tr>
