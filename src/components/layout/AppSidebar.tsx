@@ -56,7 +56,7 @@ export default function AppSidebar() {
         })}
       </nav>
 
-      <div className="p-4 border-t border-border mt-auto">
+      <div className="p-4 border-t border-border mt-auto space-y-2">
         <Link 
           href="/dashboard/settings"
           className="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-muted transition-colors"
@@ -64,6 +64,17 @@ export default function AppSidebar() {
           <Settings size={20} />
           <span className="font-medium">Settings</span>
         </Link>
+        <form action={async () => {
+          const { logout } = await import('@/app/login/actions')
+          await logout()
+        }}>
+          <button 
+            type="submit"
+            className="flex w-full items-center gap-3 px-3 py-2 rounded-lg text-red-400 hover:bg-red-500/10 hover:text-red-500 transition-colors"
+          >
+            <span className="font-medium">Log Out</span>
+          </button>
+        </form>
       </div>
     </aside>
   )

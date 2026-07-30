@@ -42,18 +42,12 @@ export default function LoginPage() {
             />
           </div>
           
-          <div className="flex gap-4 mt-6">
+          <div className="mt-6">
             <button
               formAction={login}
-              className="glow flex-1 rounded-lg bg-primary px-4 py-2 text-primary-foreground font-semibold transition-colors hover:bg-primary/90"
+              className="glow w-full rounded-lg bg-primary px-4 py-2 text-primary-foreground font-semibold transition-colors hover:bg-primary/90"
             >
               Sign In
-            </button>
-            <button
-              formAction={signup}
-              className="flex-1 rounded-lg border border-border bg-transparent px-4 py-2 text-foreground font-semibold transition-colors hover:bg-muted"
-            >
-              Sign Up
             </button>
           </div>
         </form>

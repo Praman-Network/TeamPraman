@@ -24,3 +24,9 @@ export async function login(formData: FormData) {
 export async function signup(formData: FormData) {
   redirect('/login?error=Signup is disabled in mock mode')
 }
+
+export async function logout() {
+  const cookieStore = await cookies()
+  cookieStore.delete('mock_user_role')
+  redirect('/')
+}
