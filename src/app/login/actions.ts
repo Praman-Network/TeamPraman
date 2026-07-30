@@ -7,8 +7,11 @@ export async function login(formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
 
-  // Mock Login Check for Founder
-  if (email === 'rahulchaudharyji2@gmail.com' && password === 'Rahul@123') {
+  // Check against environment variables
+  const adminEmail = process.env.ADMIN_EMAIL
+  const adminPassword = process.env.ADMIN_PASSWORD
+
+  if (email === adminEmail && password === adminPassword) {
     const cookieStore = await cookies()
     cookieStore.set('mock_user_role', 'founder', { secure: true, path: '/' })
     redirect('/dashboard')
