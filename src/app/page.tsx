@@ -42,7 +42,7 @@ export default async function PublicLeaderboardPage({ searchParams }: { searchPa
             <img src="/PramanLogo.png" alt="Praman Logo" className="w-8 h-8 object-contain drop-shadow-[0_0_10px_rgba(0,229,255,0.5)]" />
             <h1 className="glow-text text-xl font-bold tracking-wider">PRAMAN CORE</h1>
           </div>
-          <Link href="/dashboard" className="text-sm px-4 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors border border-primary/20">
+          <Link href="/login" className="text-sm px-4 py-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors border border-primary/20">
             Admin Login
           </Link>
         </div>
