@@ -56,13 +56,39 @@ export default async function PublicMemberProfilePage({ params }: { params: Prom
         {/* Profile Card */}
         <div className="glass p-8 rounded-3xl border border-border flex flex-col md:flex-row items-center md:items-start justify-between gap-8 shadow-2xl shadow-primary/5">
           <div className="flex flex-col md:flex-row items-center gap-6">
-            <div className="w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-4xl shadow-[0_0_30px_rgba(0,229,255,0.3)] border border-primary/30">
-              {user.name.charAt(0).toUpperCase()}
+            <div className="w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-4xl shadow-[0_0_30px_rgba(0,229,255,0.3)] border border-primary/30 overflow-hidden">
+              {user.avatarUrl ? (
+                <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+              ) : (
+                user.name.charAt(0).toUpperCase()
+              )}
             </div>
             <div className="text-center md:text-left">
               <h1 className="text-3xl font-extrabold text-foreground">{user.name}</h1>
               <p className="text-lg text-muted-foreground mt-1">{user.department}</p>
-              <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-2">
+              
+              {/* Social Links */}
+              {(user.linkedinUrl || user.githubUrl || user.discordHandle) && (
+                <div className="flex flex-wrap justify-center md:justify-start gap-3 mt-4">
+                  {user.linkedinUrl && (
+                    <a href={user.linkedinUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#0077b5]/10 text-[#0077b5] hover:bg-[#0077b5] hover:text-white transition-all text-sm font-semibold">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg> LinkedIn
+                    </a>
+                  )}
+                  {user.githubUrl && (
+                    <a href={user.githubUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-foreground/10 text-foreground hover:bg-foreground hover:text-background transition-all text-sm font-semibold border border-foreground/10">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg> GitHub
+                    </a>
+                  )}
+                  {user.discordHandle && (
+                    <div className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#5865F2]/10 text-[#5865F2] text-sm font-semibold border border-[#5865F2]/20">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg> {user.discordHandle}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="mt-6 flex flex-wrap justify-center md:justify-start gap-2">
                 {user.roles.map(r => (
                   <span key={r.roleId} className="px-3 py-1 bg-secondary/50 text-secondary-foreground rounded-full text-xs font-semibold border border-border/50 uppercase tracking-wider">
                     {r.role.name}

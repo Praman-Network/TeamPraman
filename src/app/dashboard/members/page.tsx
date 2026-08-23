@@ -4,7 +4,7 @@ import { addMember } from './actions'
 import Link from 'next/link'
 
 export default async function MembersPage() {
-  const users = await db.user.findMany({
+  let users = await db.user.findMany({
     include: {
       roles: {
         include: {
@@ -14,6 +14,19 @@ export default async function MembersPage() {
     },
     orderBy: { createdAt: 'desc' }
   })
+
+  // Find the founder (Admin user)
+  const adminEmail = process.env.ADMIN_EMAIL
+  let founder = users.find(u => u.email === adminEmail)
+  if (!founder) {
+    founder = users.find(u => u.name.toLowerCase().includes('rahul chaudhary'))
+  }
+  if (!founder) {
+    founder = users.find(u => u.roles.some(r => r.role.name === 'Founding Member'))
+  }
+  if (founder) {
+    users = users.filter(u => u.id !== founder.id)
+  }
 
   return (
     <div className="space-y-6">

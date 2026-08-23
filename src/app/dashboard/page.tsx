@@ -19,10 +19,28 @@ export default async function DashboardPage() {
   })
 
   // Fetch top 3 leaderboard
-  const allUsers = await db.user.findMany({
+  let allUsers = await db.user.findMany({
     where: { status: 'ACTIVE' },
-    include: { pointHistory: true }
+    include: { 
+      pointHistory: true,
+      roles: {
+        include: { role: true }
+      }
+    }
   })
+
+  // Find the founder (Admin user)
+  const adminEmail = process.env.ADMIN_EMAIL
+  let founder = allUsers.find(u => u.email === adminEmail)
+  if (!founder) {
+    founder = allUsers.find(u => u.name.toLowerCase().includes('rahul chaudhary'))
+  }
+  if (!founder) {
+    founder = allUsers.find(u => u.roles.some(r => r.role.name === 'Founding Member'))
+  }
+  if (founder) {
+    allUsers = allUsers.filter(u => u.id !== founder.id)
+  }
   const topUsers = allUsers.map(user => {
     return {
       ...user,

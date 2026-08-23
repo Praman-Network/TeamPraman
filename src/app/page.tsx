@@ -1,12 +1,16 @@
 import React from 'react'
 import { db } from '@/lib/db'
 import Link from 'next/link'
+import { cookies } from 'next/headers'
 
 export const revalidate = 0
 
 export default async function PublicLeaderboardPage({ searchParams }: { searchParams: Promise<{ filter?: string }> }) {
   const resolvedParams = await searchParams;
   const isFoundingOnly = resolvedParams.filter === 'founding';
+  
+  const cookieStore = await cookies()
+  const isAdmin = cookieStore.get('mock_user_role')?.value === 'founder'
 
   // Fetch all active users with their points
   let users = await db.user.findMany({
@@ -24,8 +28,27 @@ export default async function PublicLeaderboardPage({ searchParams }: { searchPa
     users = users.filter(user => user.roles.some(r => r.role.name === 'Founding Member'))
   }
 
+  // Find the founder for the bottom section (Admin user)
+  const adminEmail = process.env.ADMIN_EMAIL
+  let founder = users.find(u => u.email === adminEmail)
+  if (!founder) {
+    founder = users.find(u => u.name.toLowerCase().includes('rahul chaudhary'))
+  }
+  if (!founder) {
+    founder = users.find(u => u.roles.some(r => r.role.name === 'Founding Member'))
+  }
+  
+  const founderName = founder?.name || 'Rahul Chaudhary'
+  const founderAvatar = founder?.avatarUrl
+  const founderLinkedin = founder?.linkedinUrl || 'https://www.linkedin.com/in/rahul-chaudhary-b31b2a297/'
+  const founderGithub = founder?.githubUrl || 'https://github.com/Rahulchaudharyji2'
+  const founderInitial = founderName.split(' ').map(n => n.charAt(0)).join('').substring(0, 2).toUpperCase() || 'RC'
+
+  // Remove founder from the list
+  const filteredUsers = founder ? users.filter(u => u.id !== founder.id) : users
+
   // Calculate totals and sort
-  const leaderboard = users.map(user => {
+  const leaderboard = filteredUsers.map(user => {
     const totalPoints = user.pointHistory.reduce((sum, p) => sum + p.points, 0)
     return {
       ...user,
@@ -65,7 +88,7 @@ export default async function PublicLeaderboardPage({ searchParams }: { searchPa
               All Members
             </Link>
             <Link href="/?filter=founding" className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${isFoundingOnly ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' : 'text-muted-foreground hover:text-foreground'}`}>
-              Founders Only
+              Founding Member
             </Link>
           </div>
         </div>
@@ -101,13 +124,17 @@ export default async function PublicLeaderboardPage({ searchParams }: { searchPa
                     </td>
                     <td className="p-5">
                       <div className="flex items-center gap-4">
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold shadow-lg text-lg
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold shadow-lg text-lg overflow-hidden
                           ${rank === 1 ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/50' : 
                             rank === 2 ? 'bg-gray-300/20 text-gray-300 border border-gray-300/50' : 
                             rank === 3 ? 'bg-amber-600/20 text-amber-600 border border-amber-600/50' : 
                             'bg-primary/20 text-primary border border-primary/20'}`}
                         >
-                          {user.name.charAt(0).toUpperCase()}
+                          {user.avatarUrl ? (
+                            <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                          ) : (
+                            user.name.charAt(0).toUpperCase()
+                          )}
                         </div>
                         <div>
                           <div className="font-bold text-foreground text-lg tracking-tight group-hover:text-primary transition-colors">{user.name}</div>
@@ -140,6 +167,46 @@ export default async function PublicLeaderboardPage({ searchParams }: { searchPa
               })}
             </tbody>
           </table>
+        </div>
+        <div className="mt-20 py-12 border-t border-border/30">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-blue-400 drop-shadow-sm">
+              Meet The Founder
+            </h2>
+          </div>
+          <div className="max-w-3xl mx-auto glass rounded-3xl p-8 border border-border shadow-[0_0_40px_rgba(0,229,255,0.1)] flex flex-col md:flex-row items-center gap-8 relative overflow-hidden group hover:shadow-[0_0_60px_rgba(0,229,255,0.15)] transition-shadow duration-500">
+            <div className="absolute -top-24 -right-24 w-48 h-48 bg-primary/20 rounded-full blur-3xl group-hover:bg-primary/30 transition-colors duration-500"></div>
+            <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-blue-500/20 rounded-full blur-3xl group-hover:bg-blue-500/30 transition-colors duration-500"></div>
+            
+            <div className="w-36 h-36 shrink-0 rounded-full bg-gradient-to-br from-primary via-blue-500 to-purple-600 p-1 shadow-[0_0_20px_rgba(0,229,255,0.4)] transform group-hover:scale-105 transition-transform duration-500 overflow-hidden">
+              <div className="w-full h-full rounded-full bg-card flex items-center justify-center text-5xl font-black text-transparent bg-clip-text bg-gradient-to-br from-primary to-blue-500 overflow-hidden">
+                {founderAvatar ? (
+                  <img src={founderAvatar} alt={founderName} className="w-full h-full object-cover" />
+                ) : (
+                  founderInitial
+                )}
+              </div>
+            </div>
+            
+            <div className="text-center md:text-left z-10 w-full">
+              <h3 className="text-3xl font-bold text-foreground tracking-tight">{founderName}</h3>
+              <p className="text-primary mt-1 mb-4 font-semibold tracking-wider text-sm uppercase">Visionary & Creator</p>
+              <p className="text-muted-foreground mb-8 leading-relaxed max-w-lg mx-auto md:mx-0">
+                Building Praman Core to redefine team management and performance tracking. Passionate about creating seamless, transparent, and aesthetically pleasing systems for high-performing teams.
+              </p>
+              
+              <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+                <a href={founderLinkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#0077b5]/10 text-[#0077b5] border border-[#0077b5]/30 hover:bg-[#0077b5] hover:text-white transition-all duration-300 shadow-sm hover:shadow-[#0077b5]/50 hover:-translate-y-0.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
+                  <span className="text-sm font-semibold">LinkedIn</span>
+                </a>
+                <a href={founderGithub} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-foreground/5 text-foreground border border-border hover:bg-foreground hover:text-background transition-all duration-300 shadow-sm hover:shadow-foreground/30 hover:-translate-y-0.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                  <span className="text-sm font-semibold">GitHub</span>
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     </div>

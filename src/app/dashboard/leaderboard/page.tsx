@@ -24,8 +24,21 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
     users = users.filter(user => user.roles.some(r => r.role.name === 'Founding Member'))
   }
 
+  // Find the founder (Admin user)
+  const adminEmail = process.env.ADMIN_EMAIL
+  let founder = users.find(u => u.email === adminEmail)
+  if (!founder) {
+    founder = users.find(u => u.name.toLowerCase().includes('rahul chaudhary'))
+  }
+  if (!founder) {
+    founder = users.find(u => u.roles.some(r => r.role.name === 'Founding Member'))
+  }
+
+  // Remove founder from the list
+  const filteredUsers = founder ? users.filter(u => u.id !== founder.id) : users
+
   // Calculate totals and sort in descending order
-  const leaderboard = users.map(user => {
+  const leaderboard = filteredUsers.map(user => {
     const totalPoints = user.pointHistory.reduce((sum, p) => sum + p.points, 0)
     return {
       ...user,
@@ -45,7 +58,7 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
             All Members
           </Link>
           <Link href="/dashboard/leaderboard?filter=founding" className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${isFoundingOnly ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20' : 'text-muted-foreground hover:text-foreground'}`}>
-            Founders Only
+            Founding Member
           </Link>
         </div>
       </div>
@@ -80,13 +93,17 @@ export default async function LeaderboardPage({ searchParams }: { searchParams: 
                   </td>
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-lg
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-md overflow-hidden
                         ${rank === 1 ? 'bg-yellow-400/20 text-yellow-400 border border-yellow-400/50' : 
                           rank === 2 ? 'bg-gray-300/20 text-gray-300 border border-gray-300/50' : 
                           rank === 3 ? 'bg-amber-600/20 text-amber-600 border border-amber-600/50' : 
                           'bg-primary/20 text-primary border border-primary/20'}`}
                       >
-                        {user.name.charAt(0).toUpperCase()}
+                        {user.avatarUrl ? (
+                          <img src={user.avatarUrl} alt={user.name} className="w-full h-full object-cover" />
+                        ) : (
+                          user.name.charAt(0).toUpperCase()
+                        )}
                       </div>
                       <div>
                         <div className="font-bold text-foreground text-lg tracking-tight">{user.name}</div>
