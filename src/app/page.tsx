@@ -190,9 +190,9 @@ export default async function PublicLeaderboardPage({ searchParams }: { searchPa
             
             <div className="text-center md:text-left z-10 w-full">
               <h3 className="text-3xl font-bold text-foreground tracking-tight">{founderName}</h3>
-              <p className="text-primary mt-1 mb-4 font-semibold tracking-wider text-sm uppercase">Visionary & Creator</p>
+              <p className="text-primary mt-1 mb-4 font-semibold tracking-wider text-sm uppercase">Founding Member & Software Engineer</p>
               <p className="text-muted-foreground mb-8 leading-relaxed max-w-lg mx-auto md:mx-0">
-                Building Praman Core to redefine team management and performance tracking. Passionate about creating seamless, transparent, and aesthetically pleasing systems for high-performing teams.
+                Building Praman Network to redefine privacy-preserving digital identity and authentication. Passionate about turning complex Web3 and zero-knowledge technologies into seamless, secure, and developer-friendly products that make decentralized identity more accessible.
               </p>
               
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
